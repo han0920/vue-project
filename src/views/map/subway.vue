@@ -1,7 +1,5 @@
 <template>
-  <div class="subway-warp">
-    <div id="subwayMap" class="subwayMap"></div>
-  </div>
+  <div class="subway-warp" id="subwayMap"></div>
 
 </template>
 
@@ -9,12 +7,10 @@
   .subway-warp{
     width:100%;
     height:100%;
-    .subwayMap {
-      .hmap-js-popup {
-        padding: 0 21px !important;
-        background: none!important;
-        border: none !important;
-      }
+    .hmap-js-popup {
+      padding: 0 21px !important;
+      background: none!important;
+      border: none !important;
     }
   }
 </style>

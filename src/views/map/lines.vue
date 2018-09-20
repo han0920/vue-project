@@ -9,7 +9,7 @@
     </div>
     <!-- 地图展示 -->
     <!--<map-show></map-show>-->
-    <div id="map"></div>
+    <div id="linesMap"></div>
   </div>
 </template>
 
@@ -29,7 +29,7 @@
 </style>
 
 <script>
-  import HMap from '../../../static/js/hmap-js/hmap'
+  // import HMap from '../../../static/js/hmap-js/hmap'
   import * as api from '../../store/api'
   export default {
     name: 'home',
@@ -168,7 +168,7 @@
           }
 
           this.Maps = new HMap({
-            target: 'map',
+            target: 'linesMap',
             view: {
               center: [113.53450137499999, 34.44104525],
               projection: 'EPSG:4326',
