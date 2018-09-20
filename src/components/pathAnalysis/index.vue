@@ -7,49 +7,54 @@
     </div>
     <div class="path-analysis-content">
       <ul>
-        <li>
+        <li class="origins">
+          <span class="iconfont icon-qizhidian"></span>
           <span class="title">起点:</span>
           <el-autocomplete
             v-model="originsValue"
             :fetch-suggestions="querySearchAsync"
-            placeholder="（输入或者在地图点选）"
+            placeholder="输入或者在地图点选"
             @focus="focusInput('origins')"
             @select="handleSelect($event, 'origins')" clearable></el-autocomplete>
         </li>
 
-        <li>
+        <li v-for="(item, index) in avoidItems" class="avoid">
+          <span class="iconfont icon-qizhidian"></span>
           <span class="title">途经点:</span>
           <el-autocomplete
-            v-model="avoidValues"
+            v-model="avoidValues[item.id]"
             :fetch-suggestions="querySearchAsync"
-            placeholder="（输入或者在地图点选）"
+            placeholder="输入或者在地图点选"
             @focus="focusInput('avoid')"
             @select="handleSelect($event, 'avoid')" clearable></el-autocomplete>
           <!--<span v-if="index > 0" class="iconfont icon-iconless" @click.stop="delDirectivePoint('avoidValue', index)"></span>-->
-          <!--<span class="iconfont icon-jia" @click.stop="addDirectivePoint('avoidValue', index)"></span>-->
+          <span class="iconfont icon-jia" @click.stop="addDirectivePoint('avoidValue', index)"></span>
         </li>
-        <li>
+        <li v-for="(item, index) in passItems" class="pass">
+          <span class="iconfont icon-qizhidian"></span>
           <span class="title">规避点:</span>
           <el-autocomplete
-            v-model="passValues"
+            v-model="passValues[item.id]"
             :fetch-suggestions="querySearchAsync"
-            placeholder="（输入或者在地图点选）"
+            placeholder="输入或者在地图点选"
             @focus="focusInput('pass')"
             @select="handleSelect($event, 'pass')" clearable></el-autocomplete>
+          <span class="iconfont icon-jia" @click.stop="addDirectivePoint('passValues', index)"></span>
         </li>
-        <li>
+        <li class="destination">
+          <span class="iconfont icon-qizhidian"></span>
           <span class="title">终点:</span>
           <el-autocomplete
             v-model="destinationValue"
             :fetch-suggestions="querySearchAsync"
-            placeholder="（输入或者在地图点选）"
+            placeholder="输入或者在地图点选"
             @focus="focusInput('destination')"
             @select="handleSelect($event, 'destination')" clearable></el-autocomplete>
         </li>
       </ul>
     </div>
     <div class="path-analysis-button">
-      <el-button>生成</el-button>
+      <el-button @click="generate()">生成</el-button>
       <el-button>取消</el-button>
     </div>
   </div>
@@ -58,19 +63,33 @@
   .path-analysis-warp {
     position: absolute;
     right: 20px;
-    top: 80px;
+    top: 20px;
     width: 300px;
     background: #fff;
+    padding: 10px;
     .path-analysis-header {
+      .title {
+        font-size: 14px;
+      }
       .close-button {
         position: absolute;
         right: 20px;
+        &:hover {
+          color: #1b9de8;
+          cursor: pointer;
+        }
       }
     }
     .path-analysis-content {
       margin: 20px;
       ul {
         li {
+          border-bottom: 1px solid #ededed;
+          &:hover {
+            .icon-guanbi, .icon-iconless, .icon-jia {
+              display: inline;
+            }
+          }
           .title {
             display: inline-block;
             width: 50px;
@@ -86,10 +105,46 @@
               cursor: pointer;
             }
           }
+          .el-autocomplete {
+            width: 150px !important;
+          }
+          input {
+            border: none;
+            padding: 0 !important;
+          }
+        }
+        .origins {
+          .iconfont {
+            color: #29ae51;
+            &:hover {
+              cursor: pointer;
+            }
+          }
+        }
 
-          &:hover {
-            .icon-guanbi, .icon-iconless, .icon-jia {
-              display: inline-block;
+        .avoid {
+          .iconfont {
+            color: #97989B;
+            &:hover {
+              cursor: pointer;
+            }
+          }
+        }
+
+        .pass {
+          .iconfont {
+            color: #23aeef;
+            &:hover {
+              cursor: pointer;
+            }
+          }
+        }
+
+        .destination {
+          .iconfont {
+            color: #eb4f38;
+            &:hover {
+              cursor: pointer;
             }
           }
         }
@@ -108,13 +163,29 @@
   const upperFirstChart = (str) => {
     return (str.replace(/( |^)[a-z]/g, (L) => L.toUpperCase()))
   };
+  const avoidItem = {
+    id: ''
+  }
+  const passItem = {
+    id: ''
+  }
   export default {
     data () {
       return {
         originsValue: '',
         destinationValue: '',
-        passValues: '',
-        avoidValues: ''
+        passValues: {},
+        avoidValues: {},
+        avoidItems: [
+          {
+            id: 'avoid-item-0'
+          }
+        ],
+        passItems: [
+          {
+            id: 'pass-item-0'
+          }
+        ]
       }
     },
     mixins: [pathAnalysis],
@@ -213,7 +284,21 @@
             }
           }
         })
-      }
+      },
+      addDirectivePoint (type, index) {
+        console.log('add', type, index)
+        if (index === undefined) index = -1
+        if (type === 'avoidValue') {
+          avoidItem.id = 'avoid-item-' + (index + 1)
+          this.avoidItems[index + 1] = avoidItem
+          this.$set(this.avoidValues, avoidItem.id, '')
+        } else {
+          passItem.id = 'pass-item-' + (index + 1)
+          this.passItems[index + 1] = passItem
+          this.$set(this.passValues, passItem.id, '')
+        }
+      },
+      generate () {}
     }
   }
 </script>
