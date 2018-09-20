@@ -15,7 +15,6 @@
             placeholder="（输入或者在地图点选）"
             @focus="focusInput('origins')"
             @select="handleSelect($event, 'origins')" clearable></el-autocomplete>
-          <span class="iconfont icon-guanbi"></span>
         </li>
 
         <li>
@@ -26,7 +25,8 @@
             placeholder="（输入或者在地图点选）"
             @focus="focusInput('avoid')"
             @select="handleSelect($event, 'avoid')" clearable></el-autocomplete>
-          <span class="iconfont icon-guanbi"></span>
+          <!--<span v-if="index > 0" class="iconfont icon-iconless" @click.stop="delDirectivePoint('avoidValue', index)"></span>-->
+          <!--<span class="iconfont icon-jia" @click.stop="addDirectivePoint('avoidValue', index)"></span>-->
         </li>
         <li>
           <span class="title">规避点:</span>
@@ -36,7 +36,6 @@
             placeholder="（输入或者在地图点选）"
             @focus="focusInput('pass')"
             @select="handleSelect($event, 'pass')" clearable></el-autocomplete>
-          <span class="iconfont icon-guanbi"></span>
         </li>
         <li>
           <span class="title">终点:</span>
@@ -46,7 +45,6 @@
             placeholder="（输入或者在地图点选）"
             @focus="focusInput('destination')"
             @select="handleSelect($event, 'destination')" clearable></el-autocomplete>
-          <span class="iconfont icon-guanbi"></span>
         </li>
       </ul>
     </div>
@@ -79,6 +77,21 @@
             height: 30px;
             line-height: 30px;
           }
+
+          .icon-guanbi, .icon-iconless, .icon-jia {
+            display: none;
+            color: #5B5E65!important;
+            &:hover {
+              color: #1b9de8!important;
+              cursor: pointer;
+            }
+          }
+
+          &:hover {
+            .icon-guanbi, .icon-iconless, .icon-jia {
+              display: inline-block;
+            }
+          }
         }
       }
     }
@@ -92,9 +105,16 @@
   import {mapState} from 'vuex'
   import pathAnalysis from './helper'
   import {pathAnalysisAutoFetch, pathAnalysisQueryPoint} from '../../services';
+  const upperFirstChart = (str) => {
+    return (str.replace(/( |^)[a-z]/g, (L) => L.toUpperCase()))
+  };
   export default {
     data () {
       return {
+        originsValue: '',
+        destinationValue: '',
+        passValues: '',
+        avoidValues: ''
       }
     },
     mixins: [pathAnalysis],
@@ -137,6 +157,7 @@
     components: {
     },
     methods: {
+      onClose () {},
       querySearchAsync (queryString, callback) {
         pathAnalysisAutoFetch(queryString).then(res => {
           let data = (typeof res.data === 'string' ? JSON.parse(res.data) : res.data)
@@ -151,8 +172,17 @@
           }, type)
         })
       },
-      focusInput () {},
-      handleSelect () {},
+      focusInput (type) {
+        this.$map.getMap().un('click', this.handleMapClick.bind(this, type))
+        this.$map.getMap().once('click', this.handleMapClick.bind(this, type))
+      },
+      handleSelect (item, type) {
+        this.$map.un('click', this.handleMapClick, this)
+        this.$store.dispatch('actionPath' + upperFirstChart(type), {
+          value: item.value,
+          address: item.address
+        })
+      },
       drawPoint (type, res) {
         const point = {
           attributes: {

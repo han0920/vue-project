@@ -21,13 +21,6 @@
     name: 'home',
     data () {
       return {
-        msg: 'vue学习开发实践-学习1.0',
-        Maps: '',
-        lines: [],
-        clickOnShow: true,
-        extent: [],
-        origin: [],
-        resolutions: []
       }
     },
     watch: {},
